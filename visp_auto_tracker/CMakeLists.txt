@@ -13,19 +13,18 @@ find_package(catkin REQUIRED COMPONENTS
   message_filters
 )
 
-# TO FIX, VISP_DEFINITIONS and VISP_LIBRARY_DIRS should come from visp_bridge dependency
-find_package(VISP REQUIRED)
-add_definitions(${VISP_DEFINITIONS})
-link_directories(${VISP_LIBRARY_DIRS})
-
 find_package(Boost REQUIRED COMPONENTS filesystem system signals regex date_time program_options thread)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(zbar REQUIRED zbar)
+pkg_check_modules(libdmtx REQUIRED libdmtx)
 
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
-)
+include_directories(${visp_bridge_INCLUDE_DIRS})
 
-catkin_package()
+catkin_package(
+  INCLUDE_DIRS ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
+  CATKIN_DEPENDS visp_bridge visp_tracker message_filters
+  DEPENDS Boost VISP zbar libdmtx
+  )
 
 
 include_directories("flashcode_mbt")
@@ -59,7 +58,6 @@ add_executable(visp_auto_tracker
 #rosbuild_link_boost(visp_auto_tracker filesystem system signals regex date_time program_options thread)
 
 add_dependencies(visp_auto_tracker visp_auto_tracker_bag)
-#target_link_libraries(visp_auto_tracker auto_tracker qrcode_detector datamatrix_detector cmd_line dmtx zbar )
 target_link_libraries(visp_auto_tracker auto_tracker qrcode_detector datamatrix_detector cmd_line dmtx zbar)
 target_link_libraries(visp_auto_tracker ${resource_retriever_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
